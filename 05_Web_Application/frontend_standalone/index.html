@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GeoRoad Intelligence - Autonomous Satellite Network Extraction</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- React & Babel for zero-install instant UI -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    :root {
+      --bg-primary: #0a0e17;
+      --bg-secondary: #131b2a;
+      --bg-card: #182337;
+      --border: #23344f;
+      --border-focus: #3b82f6;
+      --accent-cyan: #06b6d4;
+      --accent-green: #10b981;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      background: rgba(19, 27, 42, 0.9);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .brand { display: flex; align-items: center; gap: 0.85rem; }
+    .brand-icon {
+      width: 38px; height: 38px;
+      background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+      border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 20px rgba(6, 182, 212, 0.4);
+      font-weight: 900; font-size: 1.1rem; color: #fff;
+    }
+    .brand-title {
+      font-size: 1.25rem; font-weight: 700; letter-spacing: -0.02em;
+      background: linear-gradient(to right, #fff, #94a3b8);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .brand-badge {
+      font-size: 0.72rem; padding: 0.2rem 0.6rem;
+      background: rgba(16, 185, 129, 0.15); color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 9999px;
+      font-family: var(--font-mono); font-weight: 600;
+    }
+
+    .app-container {
+      max-width: 1550px; margin: 0 auto; padding: 2rem;
+      display: grid; grid-template-columns: 390px 1fr; gap: 2rem;
+    }
+    @media (max-width: 1080px) { .app-container { grid-template-columns: 1fr; } }
+
+    .controls-card {
+      background: var(--bg-secondary); border: 1px solid var(--border);
+      border-radius: 16px; padding: 1.5rem; display: flex; flex-direction: column;
+      gap: 1.4rem; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+    .card-heading {
+      font-size: 0.88rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.05em; color: var(--text-muted);
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+
+    .dropzone {
+      border: 2px dashed var(--border); border-radius: 12px; padding: 1.8rem 1.2rem;
+      text-align: center; cursor: pointer; transition: all 0.2s ease;
+      background: rgba(24, 35, 55, 0.5); display: flex; flex-direction: column;
+      align-items: center; gap: 0.65rem;
+    }
+    .dropzone:hover {
+      border-color: var(--accent-cyan); background: rgba(6, 182, 212, 0.08);
+    }
+
+    .control-group { display: flex; flex-direction: column; gap: 0.45rem; }
+    .control-label-row {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 0.85rem; font-weight: 500;
+    }
+    .control-val { font-family: var(--font-mono); color: var(--accent-cyan); font-size: 0.8rem; }
+
+    input[type="range"] {
+      -webkit-appearance: none; width: 100%; height: 6px;
+      background: var(--bg-card); border-radius: 4px; outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 16px; height: 16px;
+      border-radius: 50%; background: var(--accent-cyan); cursor: pointer;
+      box-shadow: 0 0 10px rgba(6, 182, 212, 0.6);
+    }
+
+    .mode-selector {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;
+      background: var(--bg-card); padding: 0.25rem; border-radius: 8px;
+    }
+    .mode-btn {
+      background: transparent; border: none; color: var(--text-muted);
+      padding: 0.6rem 0.5rem; font-size: 0.8rem; font-weight: 600;
+      border-radius: 6px; cursor: pointer; transition: all 0.2s;
+    }
+    .mode-btn.active {
+      background: var(--accent-cyan); color: #041320;
+      box-shadow: 0 2px 10px rgba(6, 182, 212, 0.3);
+    }
+
+    .btn-run {
+      background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+      color: white; border: none; border-radius: 10px; padding: 0.9rem 1.5rem;
+      font-weight: 600; font-size: 0.95rem; cursor: pointer; display: flex;
+      align-items: center; justify-content: center; gap: 0.5rem;
+      box-shadow: 0 4px 15px rgba(6, 182, 212, 0.35); transition: all 0.2s ease;
+    }
+    .btn-run:hover:not(:disabled) {
+      opacity: 0.95; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(6, 182, 212, 0.5);
+    }
+    .btn-run:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .main-display { display: flex; flex-direction: column; gap: 1.5rem; }
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1rem;
+    }
+    .stat-card {
+      background: var(--bg-secondary); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.25rem; display: flex; flex-direction: column; gap: 0.3rem;
+    }
+    .stat-label {
+      font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+      color: var(--text-dim); letter-spacing: 0.05em;
+    }
+    .stat-value {
+      font-size: 1.85rem; font-weight: 800; font-family: var(--font-mono); color: var(--text-main);
+    }
+    .stat-value.green { color: #10b981; }
+    .stat-value.cyan { color: #06b6d4; }
+
+    .canvas-card {
+      background: var(--bg-secondary); border: 1px solid var(--border);
+      border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+    .canvas-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.9rem 1.5rem; border-bottom: 1px solid var(--border);
+      background: rgba(24, 35, 55, 0.4);
+    }
+    .view-tabs { display: flex; gap: 0.5rem; }
+    .tab-btn {
+      background: transparent; border: 1px solid var(--border); color: var(--text-muted);
+      padding: 0.45rem 0.85rem; border-radius: 6px; font-size: 0.8rem; cursor: pointer; transition: all 0.2s;
+    }
+    .tab-btn.active {
+      background: rgba(6, 182, 212, 0.15); border-color: var(--accent-cyan); color: var(--accent-cyan);
+    }
+
+    .canvas-body {
+      padding: 1.5rem; display: flex; align-items: center; justify-content: center;
+      min-height: 520px; background: #080c14;
+    }
+    .result-image {
+      max-width: 100%; max-height: 680px; border-radius: 8px; object-fit: contain;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    }
+    .json-viewer {
+      background: #090d15; border-radius: 8px; padding: 1.25rem; max-height: 550px;
+      overflow-y: auto; font-family: var(--font-mono); font-size: 0.82rem; color: #38bdf8;
+      white-space: pre-wrap; width: 100%;
+    }
+    .spinner {
+      width: 22px; height: 22px; border: 2.5px solid rgba(255, 255, 255, 0.2);
+      border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    function App() {
+      const [selectedFile, setSelectedFile] = useState(null);
+      const [previewUrl, setPreviewUrl] = useState(null);
+      const [mode, setMode] = useState('crop');
+      const [roadThresh, setRoadThresh] = useState(0.30);
+      const [interThresh, setInterThresh] = useState(0.16);
+
+      const [loading, setLoading] = useState(false);
+      const [result, setResult] = useState(null);
+      const [activeTab, setActiveTab] = useState('overlay');
+      const [systemStatus, setSystemStatus] = useState(null);
+
+      useEffect(() => {
+        fetch('http://127.0.0.1:8000/health')
+          .then(res => res.json())
+          .then(data => setSystemStatus(data))
+          .catch(() => setSystemStatus({ status: 'offline' }));
+      }, []);
+
+      const handleFile = (file) => {
+        if (file) {
+          setSelectedFile(file);
+          setPreviewUrl(URL.createObjectURL(file));
+          setResult(null);
+        }
+      };
+
+      const runExtraction = async () => {
+        if (!selectedFile) return;
+        setLoading(true);
+        const formData = new FormData();
+        formData.append('file', selectedFile);
+
+        try {
+          const url = `http://127.0.0.1:8000/extract-roads?mode=${mode}&road_thresh=${roadThresh}&inter_thresh=${interThresh}`;
+          const res = await fetch(url, { method: 'POST', body: formData });
+          if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
+          const data = await res.json();
+          setResult(data);
+          setActiveTab('overlay');
+        } catch (err) {
+          alert('Extraction failed: ' + err.message);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      const downloadJson = () => {
+        if (!result) return;
+        const blob = new Blob([JSON.stringify({
+          nodes: result.nodes,
+          edges: result.edges,
+          num_nodes: result.num_nodes,
+          num_edges: result.num_edges,
+          dimensions: result.dimensions
+        }, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `road_network_${Date.now()}.json`;
+        a.click();
+      };
+
+      return (
+        <div>
+          <nav className="navbar">
+            <div className="brand">
+              <div className="brand-icon">🌐</div>
+              <span className="brand-title">GeoRoad Intelligence</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem' }}>
+              <div className="brand-badge">
+                {systemStatus?.status === 'online' ? (
+                  <span style={{ color: '#34d399' }}>● Connected to GPU ({systemStatus.device.toUpperCase()})</span>
+                ) : (
+                  <span style={{ color: '#ef4444' }}>● API Disconnected</span>
+                )}
+              </div>
+              <div style={{ fontSize: '0.85rem', color: 'var(--text-dim)' }}>
+                Checkpoint: <strong style={{ color: '#38bdf8' }}>best_road_model.pth</strong>
+              </div>
+            </div>
+          </nav>
+
+          <div className="app-container">
+            {/* Control Panel */}
+            <div className="controls-card">
+              <div className="card-heading">1. Input Satellite Image</div>
+
+              <div 
+                className="dropzone"
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={(e) => { e.preventDefault(); handleFile(e.dataTransfer.files[0]); }}
+                onClick={() => document.getElementById('file-in').click()}
+              >
+                <input 
+                  id="file-in" 
+                  type="file" 
+                  accept="image/*" 
+                  style={{ display: 'none' }} 
+                  onChange={(e) => handleFile(e.target.files[0])} 
+                />
+                {previewUrl ? (
+                  <img src={previewUrl} alt="Preview" style={{ width: '100%', height: '140px', objectFit: 'cover', borderRadius: '8px' }} />
+                ) : (
+                  <>
+                    <div style={{ fontSize: '2rem' }}>🛰️</div>
+                    <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>Click or Drag Satellite Image</div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>CityScale / Custom Satellite</div>
+                  </>
+                )}
+              </div>
+
+              <div className="card-heading">2. Processing Canvas</div>
+              <div className="mode-selector">
+                <button 
+                  className={`mode-btn ${mode === 'crop' ? 'active' : ''}`}
+                  onClick={() => setMode('crop')}
+                >
+                  512x512 Crop (Native)
+                </button>
+                <button 
+                  className={`mode-btn ${mode === 'full' ? 'active' : ''}`}
+                  onClick={() => setMode('full')}
+                >
+                  Full Canvas (Auto)
+                </button>
+              </div>
+
+              <div className="card-heading">3. Model Sensitivity</div>
+              <div className="control-group">
+                <div className="control-label-row">
+                  <span>Road Threshold</span>
+                  <span className="control-val">{roadThresh.toFixed(2)}</span>
+                </div>
+                <input 
+                  type="range" min="0.10" max="0.60" step="0.02" value={roadThresh} 
+                  onChange={(e) => setRoadThresh(parseFloat(e.target.value))} 
+                />
+              </div>
+
+              <div className="control-group">
+                <div className="control-label-row">
+                  <span>Intersection Threshold</span>
+                  <span className="control-val">{interThresh.toFixed(2)}</span>
+                </div>
+                <input 
+                  type="range" min="0.05" max="0.40" step="0.01" value={interThresh} 
+                  onChange={(e) => setInterThresh(parseFloat(e.target.value))} 
+                />
+              </div>
+
+              <button 
+                className="btn-run"
+                disabled={!selectedFile || loading}
+                onClick={runExtraction}
+              >
+                {loading ? (
+                  <>
+                    <div className="spinner"></div>
+                    Extracting Network Graph...
+                  </>
+                ) : (
+                  <>⚡ Run GeoRoad Analysis</>
+                )}
+              </button>
+            </div>
+
+            {/* Main Visual Display */}
+            <div className="main-display">
+              <div className="stats-grid">
+                <div className="stat-card">
+                  <div className="stat-label">Detected Vertices</div>
+                  <div className="stat-value cyan">{result ? result.num_nodes : '--'}</div>
+                </div>
+                <div className="stat-card">
+                  <div className="stat-label">Extracted Edges</div>
+                  <div className="stat-value green">{result ? result.num_edges : '--'}</div>
+                </div>
+                <div className="stat-card">
+                  <div className="stat-label">Resolution</div>
+                  <div className="stat-value">
+                    {result ? `${result.dimensions.width}×${result.dimensions.height}` : '--'}
+                  </div>
+                </div>
+                <div className="stat-card">
+                  <div className="stat-label">Average Connectivity</div>
+                  <div className="stat-value">
+                    {result && result.num_nodes > 0 
+                      ? ((result.num_edges * 2) / result.num_nodes).toFixed(2) 
+                      : '--'}
+                  </div>
+                </div>
+              </div>
+
+              <div className="canvas-card">
+                <div className="canvas-header">
+                  <div className="view-tabs">
+                    <button 
+                      className={`tab-btn ${activeTab === 'overlay' ? 'active' : ''}`}
+                      onClick={() => setActiveTab('overlay')}
+                    >
+                      Vector Network Overlay
+                    </button>
+                    <button 
+                      className={`tab-btn ${activeTab === 'heatmap' ? 'active' : ''}`}
+                      onClick={() => setActiveTab('heatmap')}
+                    >
+                      Road Heatmap
+                    </button>
+                    <button 
+                      className={`tab-btn ${activeTab === 'json' ? 'active' : ''}`}
+                      onClick={() => setActiveTab('json')}
+                    >
+                      Topology JSON
+                    </button>
+                  </div>
+
+                  {result && (
+                    <button 
+                      className="tab-btn" 
+                      onClick={downloadJson}
+                      style={{ background: 'rgba(16, 185, 129, 0.15)', borderColor: '#10b981', color: '#34d399' }}
+                    >
+                      📥 Export Road Graph (.JSON)
+                    </button>
+                  )}
+                </div>
+
+                <div className="canvas-body">
+                  {loading ? (
+                    <div style={{ textAlign: 'center' }}>
+                      <div className="spinner" style={{ width: 40, height: 40, margin: '0 auto 1rem' }}></div>
+                      <div style={{ color: 'var(--text-muted)' }}>Running GeoRoad Intelligence Neural Pipeline on GPU...</div>
+                    </div>
+                  ) : result ? (
+                    <>
+                      {activeTab === 'overlay' && (
+                        <img src={result.overlay_base64} alt="Overlay" className="result-image" />
+                      )}
+                      {activeTab === 'heatmap' && (
+                        <img src={result.heatmap_base64} alt="Heatmap" className="result-image" />
+                      )}
+                      {activeTab === 'json' && (
+                        <pre className="json-viewer">
+                          {JSON.stringify({
+                            dimensions: result.dimensions,
+                            num_nodes: result.num_nodes,
+                            num_edges: result.num_edges,
+                            nodes_preview: result.nodes.slice(0, 30),
+                            edges_preview: result.edges.slice(0, 30),
+                            note: result.nodes.length > 30 ? "... truncated for UI preview. Click 'Export Road Graph' above for full file." : undefined
+                          }, null, 2)}
+                        </pre>
+                      )}
+                    </>
+                  ) : (
+                    <div style={{ textAlign: 'center', color: 'var(--text-dim)' }}>
+                      <div style={{ fontSize: '3rem', marginBottom: '0.5rem' }}>🗺️</div>
+                      <div>Upload a satellite image to extract vector road networks</div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
+

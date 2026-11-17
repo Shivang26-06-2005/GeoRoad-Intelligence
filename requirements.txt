@@ -1,0 +1,17 @@
+# GeoRoad Intelligence - Master Environment Requirements
+torch>=2.0.0
+torchvision>=0.15.0
+torchaudio
+numpy>=1.22.0
+scipy>=1.9.0
+scikit-learn>=1.2.0
+opencv-python>=4.7.0
+matplotlib>=3.6.0
+pillow>=9.5.0
+tqdm>=4.65.0
+fastapi>=0.95.0
+uvicorn[standard]>=0.22.0
+python-multipart>=0.0.6
+requests>=2.28.0
+python-docx>=1.1.0
+python-pptx>=0.6.21

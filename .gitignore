@@ -1,0 +1,42 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# PyTorch large model weights & checkpoints (>100MB cannot be pushed to standard GitHub)
+*.pth
+*.pt
+*.bin
+*.ckpt
+04_Final_Deep_Learning_Model/weights/*.pth
+04_Final_Deep_Learning_Model/checkpoints/*.pth
+FinalModel/weights/*.pth
+FinalModel/checkpoints/*.pth
+
+# Large Dataset archives and raw imagery
+*.zip
+*.tar
+*.tar.gz
+*.7z
+City_Scale Dataset/
+Sentinel 2 Dataset/
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+Desktop.ini
