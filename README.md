@@ -5,7 +5,7 @@
 [![PyTorch 2.0+](https://img.shields.io/badge/pytorch-2.0+-ee4c2c.svg)](https://pytorch.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.95+-009688.svg)](https://fastapi.tiangolo.com)
 [![React 18](https://img.shields.io/badge/React-18.0+-61dafb.svg)](https://react.dev/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 
 GeoRoad Intelligence is an autonomous, end-to-end deep learning system that extracts **topologically connected vector road networks** (intersection vertices and road segment edges) directly from raw high-resolution aerial and satellite imagery.
 
